@@ -23,5 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 
+api/src/instance
 api/virtualenv/
 api/var/
+
+.env
