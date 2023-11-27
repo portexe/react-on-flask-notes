@@ -1,4 +1,4 @@
-import { Note } from "../../types";
+import { Note } from "../../../types";
 
 interface Props {
   note: Note;

@@ -52,11 +52,13 @@ def notes():
             original_error_message = str(e)
             raise CustomException('Error adding the note', 400, original_error_message)
         
-@api_blueprint.route('/note', methods=["GET", "POST"])
+@api_blueprint.route('/note', methods=["POST"])
+@api_blueprint.route('/note/<slug>', methods=["GET", "PUT"])
 @auth_required()
-def note():
+def note(slug = None):
+    user_id = current_user.id
+
     if request.method == "POST":
-        user_id = current_user.id
         new_note = request.get_json()
 
         try:
@@ -73,5 +75,40 @@ def note():
             original_error_message = str(e)
             raise CustomException('Error adding the note', 400, original_error_message)
     elif request.method == "GET":
-        # TODO: How to get the param? (ex. /note/25)
-        return 500
+        try:
+            note = Note.query.get(slug)
+
+            if note.user_id == user_id:
+                return jsonify({ "success": True, "note": note })
+            else:
+                response = jsonify({ "error": "Unauthorized", "success": False })
+                response.status_code = 403
+                return response
+        except Exception as e:
+            original_error_message = str(e)
+            raise CustomException('Error adding the note', 400, original_error_message)
+    elif request.method == "PUT":
+        try:
+            updated_note_data = request.get_json()
+            stored_note = Note.query.get(slug)
+
+            if stored_note.user_id == user_id:
+                title = updated_note_data["title"]
+                content = updated_note_data["content"]
+
+                if stored_note and title and content:
+                    stored_note.title = title
+                    stored_note.content = content
+                    db.session.commit()
+                    return jsonify({ "success": True })
+                else:
+                    response = jsonify({ "error": "Malformed request", "success": False })
+                    response.status_code = 400
+                    return response
+            else:
+                response = jsonify({ "error": "Unauthorized", "success": False })
+                response.status_code = 403
+                return response
+        except Exception as e:
+            original_error_message = str(e)
+            raise CustomException('Error adding the note', 400, original_error_message)

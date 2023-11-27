@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Note } from "../../types";
-import { NotePreview } from "..";
-import { apiFetch } from "../../shared";
+import { Note } from "../../../types";
+import { NotePreview } from "../..";
+import { apiFetch } from "../../../shared";
 import { Link } from "react-router-dom";
 
 export function App() {
@@ -31,7 +31,9 @@ export function App() {
       {notes.length === 0 && <h3>No notes yet!</h3>}
 
       {notes.map((note) => (
-        <NotePreview key={note.id} note={note} />
+        <Link key={note.id} to={`/note/${note.id}`}>
+          <NotePreview note={note} />
+        </Link>
       ))}
     </main>
   );

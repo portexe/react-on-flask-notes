@@ -71,11 +71,7 @@ function redirectIfAlreadyExists(errors: string[]) {
 }
 
 function requestIsUnauthorized(res: Response, path: string) {
-  return (
-    res.status === 401 ||
-    res.status === 403 ||
-    (res.status === 200 && path === "/logout")
-  );
+  return res.status === 401 || (res.status === 200 && path === "/logout");
 }
 
 function redirect(path: string) {

@@ -3,3 +3,8 @@ export interface Note {
   title: string;
   content: string;
 }
+
+export type FormSubmitArg = {
+  title: string;
+  content: string;
+};
