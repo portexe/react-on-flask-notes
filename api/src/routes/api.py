@@ -3,7 +3,7 @@ from db.models import Note
 from constants import client_origins
 from flask import jsonify, request, Blueprint
 from error.custom_errors import CustomException
-from flask_security import auth_required, UserMixin, RoleMixin, login_user
+from flask_security import auth_required, current_user
 
 api_blueprint = Blueprint('api_blueprint', __name__)
 
@@ -26,11 +26,14 @@ def handle_exception(error):
 
     return response
 
-@api_blueprint.route('/notes', methods=['GET', 'POST'])
+# TODO: Create a decorator to ensure you only get notes for a specific User
+@api_blueprint.route('/notes', methods=['GET'])
 @auth_required()
-def get_notes():
+def notes():
     if request.method == "GET":
-        all_notes = Note.query.all()
+        user_id = current_user.id
+        all_notes = Note.query.where(Note.user_id == user_id).all()
+
         return jsonify({"notes": all_notes})
     elif request.method == "POST":
         new_note = request.get_json()
@@ -48,3 +51,27 @@ def get_notes():
         except Exception as e:
             original_error_message = str(e)
             raise CustomException('Error adding the note', 400, original_error_message)
+        
+@api_blueprint.route('/note', methods=["GET", "POST"])
+@auth_required()
+def note():
+    if request.method == "POST":
+        user_id = current_user.id
+        new_note = request.get_json()
+
+        try:
+            title = new_note["title"]
+            content = new_note["content"]
+            db.session.add(Note(title=title, content=content, user_id=user_id))
+            db.session.commit()
+
+            response = jsonify({"success": True})
+            response.status_code = 201
+            
+            return response
+        except Exception as e:
+            original_error_message = str(e)
+            raise CustomException('Error adding the note', 400, original_error_message)
+    elif request.method == "GET":
+        # TODO: How to get the param? (ex. /note/25)
+        return 500

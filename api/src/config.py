@@ -33,3 +33,5 @@ def configure_app():
 
     # Enable registration
     app.config['SECURITY_REGISTERABLE'] = True
+
+    app.config["SECURITY_CSRF_COOKIE_NAME"] = "XSRF-TOKEN"

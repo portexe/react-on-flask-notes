@@ -8,12 +8,15 @@ from flask_wtf.csrf import CSRFProtect
 from flask_security import Security, SQLAlchemyUserDatastore, hash_password
 from flask_security.models import fsqla_v3 as fsqla
 from flask_mailman import Mail
+from flask_migrate import Migrate
 
 # Loads .env into os.environ
 load_dotenv()
 
 # Sets all the app.configs
 configure_app()
+
+migrate = Migrate(app, db)
 
 mail = Mail(app)
 

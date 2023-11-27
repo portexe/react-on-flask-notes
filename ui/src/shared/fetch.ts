@@ -22,6 +22,8 @@ export function apiFetch({
 }: FetchArgs) {
   const fetchBody = body ? JSON.stringify(body) : undefined;
 
+  const xsrfCookie = getCookie("XSRF-TOKEN");
+
   return fetch(`${serverUrl}${path}`, {
     body: fetchBody,
     method,
@@ -30,9 +32,11 @@ export function apiFetch({
     headers: {
       ...customHeaders,
       "Content-Type": "application/json",
+      "X-XSRF-TOKEN": xsrfCookie,
     },
   }).then(async (res) => {
-    if (res.status === 200 && path !== "/logout") return res.json();
+    if (`${res.status}`.startsWith("2") && path !== "/logout")
+      return res.json();
 
     if (requestIsUnauthorized(res, path)) {
       redirect("/login");
@@ -76,4 +80,19 @@ function requestIsUnauthorized(res: Response, path: string) {
 
 function redirect(path: string) {
   window.location.href = path;
+}
+
+function getCookie(name: string) {
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + "=")) {
+        return decodeURIComponent(cookie.substring(name.length + 1));
+      }
+    }
+  }
+
+  return "";
 }

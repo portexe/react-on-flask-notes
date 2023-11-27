@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Note } from "../../types";
 import { NotePreview } from "..";
 import { apiFetch } from "../../shared";
+import { Link } from "react-router-dom";
 
 export function App() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -20,6 +21,11 @@ export function App() {
   return (
     <main>
       <button onClick={logOut}>Log Out</button>
+
+      <Link to="/new">
+        <button type="button">Add Note</button>
+      </Link>
+
       {error && <p>{error}</p>}
 
       {notes.length === 0 && <h3>No notes yet!</h3>}
