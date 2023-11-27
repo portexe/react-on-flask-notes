@@ -1,8 +1,9 @@
 from app import app, db
 from db.models import Note
-from constants import client_origin
+from constants import client_origins
 from flask import jsonify, request, Blueprint
 from error.custom_errors import CustomException
+from flask_security import auth_required, UserMixin, RoleMixin, login_user
 
 api_blueprint = Blueprint('api_blueprint', __name__)
 
@@ -20,11 +21,13 @@ def handle_exception(error):
 
     response = jsonify({"error": error_message})
     response.status_code = status_code
-    response.headers.add('Access-Control-Allow-Origin', client_origin)
+
+    response.headers.add('Access-Control-Allow-Origin', client_origins[1])
 
     return response
 
 @api_blueprint.route('/notes', methods=['GET', 'POST'])
+@auth_required()
 def get_notes():
     if request.method == "GET":
         all_notes = Note.query.all()

@@ -13,8 +13,13 @@ export function App() {
       .catch(() => setError("Server error"));
   }, []);
 
+  function logOut() {
+    apiFetch({ path: "/logout", method: "POST" });
+  }
+
   return (
     <main>
+      <button onClick={logOut}>Log Out</button>
       {error && <p>{error}</p>}
 
       {notes.length === 0 && <h3>No notes yet!</h3>}

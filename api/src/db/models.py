@@ -8,4 +8,3 @@ class Note(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     content: Mapped[str] = mapped_column(String, nullable=False)
-    
