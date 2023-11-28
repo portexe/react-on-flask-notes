@@ -3,5 +3,15 @@ interface Props {
 }
 
 export function NoteTitleInput({ value = "" }: Props) {
-  return <input placeholder="Title" name="title" defaultValue={value} />;
+  return (
+    <label>
+      Title
+      <input
+        placeholder="Title"
+        name="title"
+        defaultValue={value}
+        className="w-full border-indigo-200 border-2 p-2 rounded"
+      />
+    </label>
+  );
 }

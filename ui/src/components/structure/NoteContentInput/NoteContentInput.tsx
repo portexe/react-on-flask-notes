@@ -4,6 +4,14 @@ interface Props {
 
 export function NoteContentInput({ value = "" }: Props) {
   return (
-    <textarea placeholder="Note Content" name="content" defaultValue={value} />
+    <label className="flex flex-col">
+      Content
+      <textarea
+        placeholder="Note Content"
+        name="content"
+        defaultValue={value}
+        className="p-2 rounded resize-none border-indigo-200 border-2"
+      />
+    </label>
   );
 }

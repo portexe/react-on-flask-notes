@@ -28,10 +28,15 @@ export function NoteForm({
           setError("Please check your inputs");
         }
       }}
+      className="flex flex-col items-center"
     >
-      {children}
+      <div className="flex justify-end w-full p-2">
+        <button className="p-3 bg-teal-300 rounded text-black w-24">
+          Submit
+        </button>
+      </div>
 
-      <button>Submit</button>
+      <div className="p-5 max-w-2xl flex flex-col gap-4 w-full">{children}</div>
 
       {error && <div>{error}</div>}
     </form>

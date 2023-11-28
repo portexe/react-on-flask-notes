@@ -19,7 +19,7 @@ export function App() {
   }
 
   return (
-    <main>
+    <main className="bg-orange-200">
       <button onClick={logOut}>Log Out</button>
 
       <Link to="/new">

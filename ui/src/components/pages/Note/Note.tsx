@@ -70,18 +70,22 @@ export function Note() {
   }
 
   return (
-    <div>
+    <main className="bg-orange-100">
       <NoteForm onSubmit={submit} validation={validation}>
         <NoteTitleInput value={note.title} />
 
         <NoteContentInput value={note.content} />
+
+        <button
+          type="button"
+          onClick={deleteNote}
+          className="w-full p-3 bg-rose-400 rounded"
+        >
+          Delete Note
+        </button>
       </NoteForm>
 
-      <button type="button" onClick={deleteNote}>
-        Delete Note
-      </button>
-
       {error && <div>{error}</div>}
-    </div>
+    </main>
   );
 }

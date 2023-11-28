@@ -17,10 +17,12 @@ export function NewNote() {
   }
 
   return (
-    <NoteForm onSubmit={submit} validation={validation}>
-      <NoteTitleInput />
+    <main className="bg-orange-200">
+      <NoteForm onSubmit={submit} validation={validation}>
+        <NoteTitleInput />
 
-      <NoteContentInput />
-    </NoteForm>
+        <NoteContentInput />
+      </NoteForm>
+    </main>
   );
 }
