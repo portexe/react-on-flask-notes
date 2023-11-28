@@ -19,6 +19,7 @@ def handle_errors(cb):
         
     return wrapper
 
+@handle_errors
 @auth_required()
 @api_blueprint.route('/notes', methods=['GET'])
 def notes():
