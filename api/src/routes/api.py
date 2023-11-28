@@ -26,7 +26,6 @@ def handle_exception(error):
 
     return response
 
-# TODO: Create a decorator to ensure you only get notes for a specific User
 @api_blueprint.route('/notes', methods=['GET'])
 @auth_required()
 def notes():
@@ -53,7 +52,7 @@ def notes():
             raise CustomException('Error adding the note', 400, original_error_message)
         
 @api_blueprint.route('/note', methods=["POST"])
-@api_blueprint.route('/note/<slug>', methods=["GET", "PUT"])
+@api_blueprint.route('/note/<slug>', methods=["GET", "PUT", "DELETE"])
 @auth_required()
 def note(slug = None):
     user_id = current_user.id
@@ -105,6 +104,21 @@ def note(slug = None):
                     response = jsonify({ "error": "Malformed request", "success": False })
                     response.status_code = 400
                     return response
+            else:
+                response = jsonify({ "error": "Unauthorized", "success": False })
+                response.status_code = 403
+                return response
+        except Exception as e:
+            original_error_message = str(e)
+            raise CustomException('Error adding the note', 400, original_error_message)
+    elif request.method == "DELETE":
+        try:
+            note = Note.query.get(slug)
+
+            if note.user_id == user_id:
+                db.session.delete(note)
+                db.session.commit()
+                return jsonify({ "success": True })
             else:
                 response = jsonify({ "error": "Unauthorized", "success": False })
                 response.status_code = 403

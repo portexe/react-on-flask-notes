@@ -3,8 +3,6 @@ const serverUrl = "http://127.0.0.1:5000";
 const alreadyLoggedInMessage =
   "You can only access this endpoint when not logged in.";
 
-// const alreadyRegisteredMessage = "is already associated with an account.";
-
 const redirectMessages = [alreadyLoggedInMessage];
 
 interface FetchArgs {

@@ -53,6 +53,22 @@ export function Note() {
     return !!title && !!content;
   }
 
+  function deleteNote() {
+    if (window.confirm("Are you sure you want to delete this note?")) {
+      apiFetch({
+        path: `/note/${id}`,
+        method: "DELETE",
+      })
+        .then(() => navigate("/"))
+        .catch((err: Error | undefined) =>
+          setError(
+            err?.message ||
+              "Error deleting note. Refresh the page and try again."
+          )
+        );
+    }
+  }
+
   return (
     <div>
       <NoteForm onSubmit={submit} validation={validation}>
@@ -60,6 +76,10 @@ export function Note() {
 
         <NoteContentInput value={note.content} />
       </NoteForm>
+
+      <button type="button" onClick={deleteNote}>
+        Delete Note
+      </button>
 
       {error && <div>{error}</div>}
     </div>
