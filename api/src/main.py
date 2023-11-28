@@ -1,7 +1,7 @@
 from app import db, app
 from config import configure_app
 from flask_cors import CORS
-from routes.api import api_blueprint
+from routes import api_blueprint
 from constants import client_origins
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
