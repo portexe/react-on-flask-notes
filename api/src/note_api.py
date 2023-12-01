@@ -33,8 +33,11 @@ class NoteAPI():
             raise Exception("Missing title or content")
 
         try:
-            self.db.session.add(Note(title=title, content=content, user_id=self.user_id))
+            note = Note(title=title, content=content, user_id=self.user_id)
+            self.db.session.add(note)
             self.db.session.commit()
+            
+            return note
         except:
             raise Exception("Error adding note to the database")
         
@@ -44,11 +47,12 @@ class NoteAPI():
         elif not self.authorized(note):
             raise Unauthorized("User ID does not match")
         
-        note.title = title
-        note.content = content
-
         try:
+            note.title = title
+            note.content = content
             self.db.session.commit()
+
+            return note
         except:
             raise Exception("Error updating note")
 
