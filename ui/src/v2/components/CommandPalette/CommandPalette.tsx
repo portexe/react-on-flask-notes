@@ -8,6 +8,7 @@ import {
 import { NoteSearchInput, NoteSearchResults } from "..";
 import { apiFetch } from "../../../shared";
 import { NoteSearchResult } from "../../../types";
+import { CiSearch, CiLogout, CiCirclePlus } from "react-icons/ci";
 
 interface Props {
   open: boolean;
@@ -16,7 +17,7 @@ interface Props {
 
 export function CommandPalette({ open, closeEvent }: Props) {
   const [searchValue, setSearchValue] = useState("");
-  const [searchResults, setSearchResults] = useState<NoteSearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<NoteSearchResult[]>();
 
   const debouncedSearchTerm = useDebounce(searchValue, 1000);
   const portalReady = useCommandPortal(open);
@@ -28,7 +29,7 @@ export function CommandPalette({ open, closeEvent }: Props) {
   useEffect(() => {
     if (!open || !debouncedSearchTerm) {
       setSearchValue("");
-      setSearchResults([]);
+      setSearchResults(undefined);
       return;
     }
 
@@ -46,17 +47,33 @@ export function CommandPalette({ open, closeEvent }: Props) {
   return (
     <CommandPortal>
       <Modal>
-        <ModalSection>
+        <ModalSection margin="small" clickable={false}>
           <NoteSearchSection
             searchValue={searchValue}
-            searchResults={searchResults}
             setSearchValue={setSearchValue}
           />
         </ModalSection>
 
-        <ModalSection>Create Note</ModalSection>
+        {Array.isArray(searchResults) && (
+          <ModalSection clickable={false}>
+            <div className="ml-8 text-xs">Search Results:</div>
+            <NoteSearchResults notes={searchResults} />
+          </ModalSection>
+        )}
 
-        <ModalSection>Log Out</ModalSection>
+        <ModalSection>
+          <div className="flex items-center gap-2 text-xl">
+            <CiCirclePlus />
+            Create Note
+          </div>
+        </ModalSection>
+
+        <ModalSection>
+          <div className="flex items-center gap-2 text-xl">
+            <CiLogout />
+            Log Out
+          </div>
+        </ModalSection>
       </Modal>
 
       <Backdrop closeEvent={closeEvent} />
@@ -66,21 +83,16 @@ export function CommandPalette({ open, closeEvent }: Props) {
 
 function NoteSearchSection({
   searchValue,
-  searchResults,
   setSearchValue,
 }: {
   searchValue: string;
-  searchResults: NoteSearchResult[];
   setSearchValue: (val: string) => void;
 }) {
   return (
-    <>
-      <search className="pb-2 mb-4">
-        <NoteSearchInput value={searchValue} onChange={setSearchValue} />
-      </search>
-
-      <NoteSearchResults notes={searchResults} />
-    </>
+    <search className="flex items-center gap-1">
+      <CiSearch />
+      <NoteSearchInput value={searchValue} onChange={setSearchValue} />
+    </search>
   );
 }
 
@@ -94,19 +106,38 @@ function Backdrop({ closeEvent }: { closeEvent: () => void }) {
   return (
     <div
       onClick={closeEvent}
-      className="z-0 w-full h-full absolute top-0 left-0 bg-zinc-300"
+      className="absolute top-0 left-0 z-0 w-full h-full bg-zinc-300"
     ></div>
   );
 }
 
 function Modal({ children }: PropsWithChildren) {
   return (
-    <div className="flex flex-col w-96 max-w-full max-h-full bg-white 400 z-10 drop-shadow-lg rounded-lg p-6">
+    <div className="z-10 flex flex-col max-w-full overflow-auto bg-white rounded-lg max-h-comfortable w-160 400 drop-shadow-lg">
       {children}
     </div>
   );
 }
 
-function ModalSection({ children }: PropsWithChildren) {
-  return <div className="border-b-2 border-gray-400 pb-4 mb-4">{children}</div>;
+type ModalSectionProps = PropsWithChildren & {
+  clickable?: boolean;
+  margin?: "small" | "medium" | "large";
+};
+
+function ModalSection({
+  children,
+  margin = "medium",
+  clickable = true,
+}: ModalSectionProps) {
+  return (
+    <div
+      className={`border-b-2 border-gray-200 p-4 ${
+        clickable && "hover:bg-gray-100 cursor-pointer"
+      } ${
+        margin === "small" ? "pb-4" : margin === "medium" ? "pb-6" : "pb-8"
+      } ${margin === "small" ? "pt-4" : margin === "medium" ? "pt-6" : "pt-8"}`}
+    >
+      {children}
+    </div>
+  );
 }

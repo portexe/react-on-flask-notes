@@ -1,4 +1,5 @@
 import DOMPurify from "dompurify";
+import { CiFileOn } from "react-icons/ci";
 
 import type { NoteSearchResult, SearchResultSnippet } from "../../../types";
 
@@ -14,13 +15,21 @@ export function NoteSearchResults({ notes }: Props) {
   return (
     <div>
       {notes.map((note) => (
-        <div key={note.objectID} className="pt-2 pb-2">
-          <h4 className="font-bold">
-            <SearchResultSnippet snippet={note._snippetResult.title} />
-          </h4>
+        <div
+          key={note.objectID}
+          className="flex items-center gap-2 pt-2 pb-2 cursor-pointer hover:bg-gray-100"
+        >
+          <div className="text-2xl">
+            <CiFileOn />
+          </div>
+          <div>
+            <h4 className="font-bold">
+              <SearchResultSnippet snippet={note._snippetResult.title} />
+            </h4>
 
-          <div className="text-sm text-gray-500 font-light">
-            <SearchResultSnippet snippet={note._snippetResult.content} />
+            <div className="text-sm font-light text-gray-500">
+              <SearchResultSnippet snippet={note._snippetResult.content} />
+            </div>
           </div>
         </div>
       ))}
