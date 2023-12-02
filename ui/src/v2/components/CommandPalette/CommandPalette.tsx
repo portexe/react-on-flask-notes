@@ -93,7 +93,7 @@ export function CommandPalette({ open, closeEvent }: Props) {
 
       default: {
         if (itemSelected.includes("searchResult-")) {
-          const objectID = itemSelected.split("searchResult-")[1];
+          const [, objectID] = itemSelected.split("searchResult-");
           goToNote(objectID);
         }
 

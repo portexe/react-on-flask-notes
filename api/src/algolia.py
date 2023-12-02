@@ -17,12 +17,21 @@ class Algolia():
         self.algolia_index.save_object(dict_version)
 
     def update(self, note: Note):
-        print(f"Updating note: {note.id} -> {note.title}")
-        pass
+        if not note:
+            raise Exception("Note not provided")
+        elif self.user_id != note.user_id:
+            raise Unauthorized('Note does not belong to user')
+        
+        dict_version = self.note_to_dict(note)
+        self.algolia_index.save_object(dict_version)
 
     def delete(self, note: Note):
-        print(f"Deleting note: {note.id} -> {note.title}")
-        pass
+        if not note:
+            raise Exception("Note not provided")
+        elif self.user_id != note.user_id:
+            raise Unauthorized('Note does not belong to user')
+        
+        self.algolia_index.delete_object(note.id)
 
     def search(self, term: str):
         if not term:
