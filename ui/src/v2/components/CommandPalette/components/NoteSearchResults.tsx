@@ -1,7 +1,7 @@
 import DOMPurify from "dompurify";
 import { CiFileOn } from "react-icons/ci";
 
-import type { NoteSearchResult, SearchResultSnippet } from "../../../types";
+import type { NoteSearchResult, SearchResultSnippet } from "../../../../types";
 
 import styles from "./styles.module.css";
 

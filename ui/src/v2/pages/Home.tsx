@@ -1,6 +1,7 @@
-import { useKeyPressListener } from "../hooks";
 import { PropsWithChildren, useState } from "react";
-import { CommandPalette, DefaultView } from "../components";
+
+import { useKeyPressListener } from "../hooks";
+import { CommandPalette } from "../components";
 
 export function Home() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -20,9 +21,7 @@ export function Home() {
         closeEvent={() => setCommandPaletteOpen(false)}
       />
 
-      <View>
-        <DefaultView />
-      </View>
+      <View>Press ⌘ + K to get started</View>
     </Page>
   );
 }

@@ -1,1 +1,0 @@
-export { NoteSearchResults } from "./NoteSearchResults";
