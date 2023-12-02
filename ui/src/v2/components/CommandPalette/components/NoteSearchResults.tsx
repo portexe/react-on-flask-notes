@@ -7,17 +7,24 @@ import styles from "./styles.module.css";
 
 interface Props {
   notes: NoteSearchResult[];
+  focusedItem: string;
+  onNoteClick: (id: string) => void;
 }
 
-export function NoteSearchResults({ notes }: Props) {
+export function NoteSearchResults({ notes, focusedItem, onNoteClick }: Props) {
   if (!notes.length) return <div>No results</div>;
 
   return (
     <div>
       {notes.map((note) => (
         <div
+          onClick={() => {
+            onNoteClick(note.objectID);
+          }}
           key={note.objectID}
-          className="flex items-center gap-2 pt-2 pb-2 cursor-pointer hover:bg-gray-100"
+          className={`flex items-center gap-2 pt-2 pb-2 cursor-pointer hover:bg-gray-100 ${
+            focusedItem === "searchResult-" + note.objectID && "bg-gray-100"
+          }`}
         >
           <div className="text-2xl">
             <CiFileOn />
