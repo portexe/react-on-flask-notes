@@ -4,8 +4,10 @@
   along with site-wide commands.
 */
 
+import DOMPurify from "dompurify";
+import { CiFileOn } from "react-icons/ci";
 import { useEffect, useState } from "react";
-import { CiLogout, CiCirclePlus } from "react-icons/ci";
+import { useNavigate } from "react-router-dom";
 
 import {
   Modal,
@@ -13,143 +15,82 @@ import {
   NoteSearch,
   ModalSection,
   CommandPortal,
-  NoteSearchResults,
   ModalSectionCommand,
+  SearchResult,
 } from "./components";
-import {
-  useDebounce,
-  useCommandPortal,
-  useKeyPressListener,
-} from "../../hooks";
-import {} from "..";
-import { apiFetch } from "../../../shared";
+import { useCommandNavigation, useNoteSearch } from "./hooks";
+import { useCommandPortal, useKeyPressListener } from "../../hooks";
 
-import type { NoteSearchResult } from "../../../types";
-import { useNavigate } from "react-router-dom";
+import { CommandCategory, type CommandPaletteItem } from "../../../types";
 
 interface Props {
-  open: boolean;
-  closeEvent: () => void;
+  commandItems?: CommandPaletteItem[];
 }
 
-// All items in the modal aside from search results.
-const defaultItems = ["search", "createNote", "logOut"];
+const defaultCommandItems: CommandPaletteItem[] = [];
 
-export function CommandPalette({ open, closeEvent }: Props) {
-  const [searchValue, setSearchValue] = useState("");
-  const [searchResults, setSearchResults] = useState<NoteSearchResult[]>();
+export function CommandPalette({ commandItems = defaultCommandItems }: Props) {
+  const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [commandItemsWithSearchResults, setCommandItemsWithSearchResults] =
+    useState<CommandPaletteItem[]>(commandItems);
 
-  // Focused item is the index used to access items.
-  // For example: const currentItem = items[focusedItem].
-  // This is incremented/decremented via the arrow keys.
-  const [focusedItem, setFocusedItem] = useState(0);
-  const [items, setItems] = useState<string[]>(defaultItems);
+  const goTo = useNavigate();
 
-  const debouncedSearchTerm = useDebounce(searchValue, 500);
+  const searchResults = useNoteSearch({ open, searchTerm });
+
   const portalReady = useCommandPortal(open);
 
-  const navigate = useNavigate();
+  const { items, selected } = useCommandNavigation(
+    commandItemsWithSearchResults,
+    open
+  );
 
-  function logOut() {
-    apiFetch({ path: "/logout", method: "POST" });
-  }
-
-  function goToCreateNote() {
-    navigate("/new");
-  }
-
-  function goToNote(id: string) {
-    navigate(`/note/${id}`);
-  }
-
-  function moveItem(direction: 1 | -1) {
-    if (!open) return;
-
-    setFocusedItem((f) => {
-      // If the current focus index is 0 and we hit UP, we
-      // cycle to the last item.
-      if (f <= 1 && direction === -1) return items.length - 1;
-
-      // And vise versa for the last item and DOWN.
-      if (f + 1 === items.length && direction === 1) return 1;
-
-      return f + direction;
-    });
-  }
-
-  function itemSelect() {
-    const itemSelected = items[focusedItem];
-
-    switch (itemSelected) {
-      case "createNote": {
-        goToCreateNote();
-        break;
-      }
-
-      case "logOut": {
-        logOut();
-        break;
-      }
-
-      default: {
-        if (itemSelected.includes("searchResult-")) {
-          const [, objectID] = itemSelected.split("searchResult-");
-          goToNote(objectID);
-        }
-
-        break;
-      }
-    }
-  }
+  useKeyPressListener({
+    key: "k",
+    meta: true,
+    listener: () => {
+      setOpen(true);
+    },
+  });
 
   useKeyPressListener({
     key: "Escape",
-    listener: closeEvent,
-  });
-
-  useKeyPressListener({
-    key: "ArrowUp",
-    listener: () => moveItem(-1),
-  });
-
-  useKeyPressListener({
-    key: "ArrowDown",
-    listener: () => moveItem(1),
-  });
-
-  useKeyPressListener({
-    key: "Enter",
-    listener: itemSelect,
+    listener: () => setOpen(false),
   });
 
   useEffect(() => {
-    if (!open || !debouncedSearchTerm) {
-      setSearchValue("");
-      setSearchResults(undefined);
-      setFocusedItem(0);
+    if (!open) {
+      setSearchTerm("");
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (!searchResults) {
+      setCommandItemsWithSearchResults(commandItems);
       return;
     }
 
-    apiFetch({
-      path: "/search",
-      method: "POST",
-      body: { term: debouncedSearchTerm },
-    }).then((res) => {
-      setSearchResults(res.notes);
-    });
-  }, [debouncedSearchTerm, open]);
+    const searchResultsAsModalItems = searchResults.map((r) => ({
+      icon: CiFileOn,
+      key: `searchResult-${r.objectID}`,
+      category: CommandCategory.SearchResult,
+      action: () => goTo(`/note/${r.objectID}`),
+      text: {
+        header: DOMPurify.sanitize(r._snippetResult.title.value, {
+          ALLOWED_TAGS: ["em"],
+        }),
+        content: DOMPurify.sanitize(r._snippetResult.content.value, {
+          ALLOWED_TAGS: ["em"],
+        }),
+      },
+    }));
 
-  useEffect(() => {
-    setFocusedItem(1);
-
-    if (!searchResults?.length) {
-      setItems(defaultItems);
-    } else {
-      const resultIDs = searchResults.map((r) => `searchResult-${r.objectID}`);
-
-      setItems(() => [defaultItems[0], ...resultIDs, ...defaultItems.slice(1)]);
-    }
-  }, [searchResults]);
+    setCommandItemsWithSearchResults([
+      ...searchResultsAsModalItems,
+      ...commandItems,
+    ]);
+  }, [searchResults, commandItems, goTo]);
 
   if (!open || !portalReady) return null;
 
@@ -157,47 +98,37 @@ export function CommandPalette({ open, closeEvent }: Props) {
     <CommandPortal>
       <Modal>
         <ModalSection margin="small" clickable={false}>
-          <NoteSearch
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-          />
+          <NoteSearch searchValue={searchTerm} setSearchValue={setSearchTerm} />
         </ModalSection>
 
         {Array.isArray(searchResults) && (
           <ModalSection clickable={false}>
-            <div className="ml-8 text-xs">Search Results:</div>
-            <NoteSearchResults
-              notes={searchResults}
-              focusedItem={items[focusedItem]}
-              onNoteClick={goToNote}
-            />
+            {items
+              .filter((each) => each.category === CommandCategory.SearchResult)
+              .map((item) => (
+                <SearchResult
+                  key={item.key}
+                  item={item}
+                  selected={selected.key === item.key}
+                />
+              ))}
           </ModalSection>
         )}
 
-        <ModalSection
-          focused={items[focusedItem] === "createNote"}
-          onClick={goToCreateNote}
-        >
-          <ModalSectionCommand
-            text="Create Note"
-            icon={CiCirclePlus}
-            onAction={() => console.log("Create note click")}
-          />
-        </ModalSection>
-
-        <ModalSection
-          focused={items[focusedItem] === "logOut"}
-          onClick={logOut}
-        >
-          <ModalSectionCommand
-            text="Log Out"
-            icon={CiLogout}
-            onAction={() => console.log("Log out click")}
-          />
-        </ModalSection>
+        {items
+          .filter((each) => each.category === CommandCategory.AppLevelCommand)
+          .map((i) => (
+            <ModalSection
+              key={i.key}
+              focused={selected.key === i.key}
+              onClick={i.action}
+            >
+              <ModalSectionCommand icon={i.icon} text={i.text.content} />
+            </ModalSection>
+          ))}
       </Modal>
 
-      <Backdrop closeEvent={closeEvent} />
+      <Backdrop closeEvent={() => setOpen(false)} />
     </CommandPortal>
   );
 }

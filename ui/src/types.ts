@@ -1,3 +1,5 @@
+import { IconType } from "react-icons";
+
 export interface Note {
   id?: number;
   title: string;
@@ -24,3 +26,19 @@ export type FormSubmitArg = {
   title: string;
   content: string;
 };
+
+export interface CommandPaletteItem {
+  key: string;
+  text: {
+    header?: string;
+    content: string;
+  };
+  icon: IconType;
+  action: () => void;
+  category: CommandCategory;
+}
+
+export enum CommandCategory {
+  SearchResult = "searchResult",
+  AppLevelCommand = "appLevelCommand",
+}

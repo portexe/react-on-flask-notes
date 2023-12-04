@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 
 interface Props {
   key: string;
-  listener: () => void;
+  listener: (evt: KeyboardEvent) => void;
   meta?: boolean;
 }
 
@@ -11,7 +11,7 @@ export function useKeyPressListener({ key, listener, meta = false }: Props) {
     const metaKeyFulfilled = meta ? evt.metaKey : true;
 
     if (evt.key === key && metaKeyFulfilled) {
-      listener();
+      listener(evt);
     }
   }
 

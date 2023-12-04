@@ -10,7 +10,7 @@ export function Backdrop({ closeEvent }: { closeEvent: () => void }) {
   return (
     <div
       onClick={closeEvent}
-      className="absolute top-0 left-0 z-0 w-full h-full bg-zinc-300"
+      className="absolute top-0 left-0 z-0 w-full h-full bg-opacity-20 bg-zinc-50 backdrop-blur-sm"
     ></div>
   );
 }

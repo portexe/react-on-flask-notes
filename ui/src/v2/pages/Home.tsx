@@ -1,24 +1,28 @@
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren } from "react";
+import { CiCirclePlus } from "react-icons/ci";
+import { useNavigate } from "react-router-dom";
 
-import { useKeyPressListener } from "../hooks";
 import { CommandPalette } from "../components";
 
-export function Home() {
-  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+import { CommandCategory } from "../../types";
 
-  useKeyPressListener({
-    key: "k",
-    meta: true,
-    listener: () => {
-      setCommandPaletteOpen(true);
-    },
-  });
+export function Home() {
+  const goTo = useNavigate();
 
   return (
     <Page>
       <CommandPalette
-        open={commandPaletteOpen}
-        closeEvent={() => setCommandPaletteOpen(false)}
+        commandItems={[
+          {
+            key: "createNote",
+            text: {
+              content: "Create Note",
+            },
+            icon: CiCirclePlus,
+            action: () => goTo("/note"),
+            category: CommandCategory.AppLevelCommand,
+          },
+        ]}
       />
 
       <View>Press ⌘ + K to get started</View>

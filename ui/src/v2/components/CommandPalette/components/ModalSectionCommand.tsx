@@ -9,12 +9,11 @@ import { IconType } from "react-icons";
 interface Props {
   text: string;
   icon: IconType;
-  onAction: () => void;
 }
 
-export function ModalSectionCommand({ icon, text, onAction }: Props) {
+export function ModalSectionCommand({ icon, text }: Props) {
   return (
-    <div onClick={onAction} className="flex items-center gap-2 text-xl">
+    <div className="flex items-center gap-2 text-xl">
       {icon({})}
       {text}
     </div>

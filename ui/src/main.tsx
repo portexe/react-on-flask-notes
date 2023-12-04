@@ -1,8 +1,8 @@
 import "./index.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { Home } from "./v2/pages/Home";
-import { Login, NewNote, Note, Register } from "./components";
+import { Home, Note } from "./v2/pages";
+import { Login, NewNote, Register } from "./components";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 const router = createBrowserRouter([
@@ -10,7 +10,7 @@ const router = createBrowserRouter([
 
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
-  { path: "/new", element: <NewNote /> },
+  { path: "/note", element: <Note /> },
   { path: "/note/:id", element: <Note /> },
 ]);
 
